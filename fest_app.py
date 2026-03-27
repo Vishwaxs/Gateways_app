@@ -225,6 +225,8 @@ def main() -> None:
             ax.set_xlabel("Number of Participants")
             ax.set_ylabel("College")
             ax.set_title(f"Top {top_n} Colleges")
+            for i, v in enumerate(college_cnt["Participants"]):
+                ax.text(v + 0.3, i, str(v), va="center", fontsize=9)
             plt.tight_layout()
             st.pyplot(fig, use_container_width=True)
             plt.close(fig)
@@ -260,7 +262,7 @@ def main() -> None:
         dataset_states = set(filtered["State"].unique())
         geojson_states = set(india_gdf["ST_NM"].unique())
         matched = len(dataset_states.intersection(geojson_states))
-        st.success(f"Map coverage: {matched} of {len(dataset_states)} dataset states matched on map.")
+        st.success(f"Mapped states: {matched}/{len(dataset_states)}")
 
         plot_india_map(filtered)
 
@@ -273,6 +275,8 @@ def main() -> None:
         ax.set_xlabel("State")
         ax.set_ylabel("Number of Participants")
         ax.set_title("State-wise Participant Count")
+        for i, v in enumerate(state_cnt["Participants"]):
+            ax.text(i, v + 0.2, str(v), ha="center", fontsize=9)
         plt.xticks(rotation=30, ha="right")
         plt.tight_layout()
         st.pyplot(fig, use_container_width=True)
@@ -315,6 +319,8 @@ def main() -> None:
             ax.set_xlabel("Rating")
             ax.set_ylabel("Number of Participants")
             ax.set_title("Distribution of Ratings")
+            for i, v in enumerate(rating_dist.values):
+                ax.text(i, v + 0.2, str(v), ha="center", fontsize=9)
             plt.tight_layout()
             st.pyplot(fig, use_container_width=True)
             plt.close(fig)
@@ -406,6 +412,13 @@ def main() -> None:
             plt.tight_layout()
             st.pyplot(fig, use_container_width=True)
             plt.close(fig)
+
+    # Actionable recommendation box for organizers
+    improve_timing = filtered["Feedback on Fest"].str.lower().str.contains("timing|improvement", regex=True, na=False).mean() * 100
+    st.info(
+        f"Actionable recommendation: Focus promotion on {top_event} in {top_state}; "
+        f"also improve scheduling because {improve_timing:.1f}% feedback mentions timing/improvement themes."
+    )
 
     # ---- Download filtered data ----
     st.divider()
